@@ -5,7 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
 
+import models.NBAPlayer;
 import models.NBATeam;
 
 public class NBATeamDAO 
@@ -109,4 +112,80 @@ public class NBATeamDAO
 			throw new RuntimeException("error finding department by name", e);
 		}
 	}
+	
+	/**Retrieve a NBATeam object by ID 
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public NBATeam findByID(int id) {
+		try {
+			String qry = "select * from NBATEAM where NbaTeamID = ?";
+			PreparedStatement pstmt = conn.prepareStatement(qry);
+			pstmt.setInt(1, id);
+			ResultSet rs = pstmt.executeQuery();
+
+			// return null if faculty member doesn't exist
+			if (!rs.next())
+				return null;
+
+			int teamID = rs.getInt("NbaTeamID");
+			String nbaName = rs.getString("NbaTeamName");
+			String nbaCoach = rs.getString("TeamCoach");
+			int wins = rs.getInt("NbaTeamWins");
+			int losses = rs.getInt("NbaTeamlosses");
+			int season = rs.getInt("NbaSeason");
+			
+			rs.close();
+			
+			NBATeam team = new NBATeam(this,teamID, nbaName, nbaCoach,wins,losses,season);
+
+			return team;
+		} catch (SQLException e) {
+			dbm.cleanup();
+			throw new RuntimeException("error finding department by name", e);
+		}
+	}
+	
+	
+	public Collection<NBAPlayer> getNBAPlayers(int teamNameID) {
+		try {
+			Collection<NBAPlayer> faculty = new ArrayList<NBAPlayer>();
+			String qry = "select nbaPlayerID from NBAPLAYER where nbaPlayerTeamID = ?";
+			PreparedStatement pstmt = conn.prepareStatement(qry);
+			pstmt.setInt(1, teamNameID);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				int id = rs.getInt("nbaPlayerID");
+				faculty.add(dbm.findNBAPlayer(id));
+			}
+			rs.close();
+			return faculty;
+		}
+		catch(SQLException e) {
+			dbm.cleanup();
+			throw new RuntimeException("error getting department faculty", e);
+		}
+	}
+	
+	public int getTeamNumber()
+	{
+		try{
+			
+		String qry = "select * from NBATEAM";
+		PreparedStatement pstmt = conn.prepareStatement(qry);
+		ResultSet rs = pstmt.executeQuery();
+		int rowCount = 0;
+		while ( rs.next() )
+		{
+		    // Process the row.
+		    rowCount++;
+		}
+		rs.close();
+		return rowCount;
+	} catch (SQLException e) {
+		dbm.cleanup();
+		throw new RuntimeException("error ", e);
+	}
+}
 }

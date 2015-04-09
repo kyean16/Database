@@ -7,9 +7,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
+import models.NBAPlayer;
 import models.NBATeam;
 
 import org.apache.derby.jdbc.EmbeddedDriver;
+
 
 public class DatabaseManager {
 	
@@ -17,8 +19,9 @@ public class DatabaseManager {
 	private Connection conn;
 	
 	private NBATeamDAO nbaTeamDAO;
+	private NBAPlayerDAO nbaPlayerDAO;
 	
-	private final String url = "jdbc:derby:Testing2";
+	private final String url = "jdbc:derby:7";
 
 	/**
 	 * Open Database
@@ -32,9 +35,9 @@ public class DatabaseManager {
 		
 		// try to connect to an existing database
 		try {
-			System.out.println("Database already exists");
 			conn = driver.connect(url, prop);
 			conn.setAutoCommit(false);
+			System.out.println("Database already exists");
 			
 		}
 		catch(SQLException e) {
@@ -53,6 +56,7 @@ public class DatabaseManager {
 		}
 		
 		nbaTeamDAO = new NBATeamDAO(conn, this);
+		nbaPlayerDAO = new NBAPlayerDAO(conn,this);
 		
 		
 		
@@ -67,6 +71,8 @@ public class DatabaseManager {
 	private void create(Connection conn) throws SQLException 
 	{
 		NBATeamDAO.create(conn);
+		NBAPlayerDAO.create(conn);
+		NBAPlayerDAO.addConstraints(conn);
 		conn.commit();
 	}
 	
@@ -76,12 +82,32 @@ public class DatabaseManager {
 		return nbaTeamDAO.insert(nbaTeamID, nbaTeamName, teamCoach, nbaTeamWins,nbaTeamLosses,nbaSeason);
 	}
 	
+	public NBAPlayer insertNBAPlayer(int nbaPlayerID, String nbaPlayerName, NBATeam nbaPlayerTeamID, 
+			int nbaPlayerSalary, String nbaPlayerHealthStatus, int nbaPlayerAge, 
+			String nbaPlayerHometown, String nbaPlayerPosition){
+		return nbaPlayerDAO.insert(nbaPlayerID,  nbaPlayerName, nbaPlayerTeamID,
+				nbaPlayerSalary, nbaPlayerHealthStatus, nbaPlayerAge, nbaPlayerHometown, nbaPlayerPosition);
+	}
+	
+	//****************************************************************
+		//Get Function
+	public int getNBATeams()
+	{
+		return nbaTeamDAO.getTeamNumber();
+	}
 	//****************************************************************
 		//Find Function
 	public NBATeam findNBATeamByName(String name) {
 		return nbaTeamDAO.findByName(name);
 	}
 
+	public NBATeam findNBATeambyID(int id){
+		return nbaTeamDAO.findByID(id);
+	}
+	
+	public NBAPlayer findNBAPlayer(int id) {
+		return nbaPlayerDAO.findbyID(id);
+	}
 	
 	//***************************************************************
 		// Utility functions
@@ -142,7 +168,10 @@ public class DatabaseManager {
 				// This is not as straightforward as it may seem, because
 				// of the cyclic foreign keys -- I had to play with
 				// "on delete set null" and "on delete cascade" for a bit
+				
+				nbaPlayerDAO.clear();
 				nbaTeamDAO.clear();
+				
 			} catch (SQLException e) {
 				throw new RuntimeException("cannot clear tables", e);
 			}

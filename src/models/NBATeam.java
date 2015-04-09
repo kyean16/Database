@@ -3,6 +3,7 @@ package models;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 
 import dao.NBATeamDAO;
 
@@ -15,6 +16,8 @@ public class NBATeam
 	private int nbaTeamWins;
 	private int nbaTeamLosses;
 	private int nbaSeason;
+	
+	private Collection<NBAPlayer> players;
 	
 	/**
 	 * Constructor sets up data
@@ -67,6 +70,17 @@ public class NBATeam
 	public String getNbaTeamName()
 	{
 		return nbaTeamName;
+	}
+	
+	public String toString()
+	{
+		return "Team:" + nbaTeamName + ",Coach:" + teamCoach + ",Season:" + nbaSeason; 
+	}
+	
+	public Collection<NBAPlayer> getPlayers()
+	{
+		if (players == null) players = dao.getNBAPlayers(nbaTeamID);
+		return players;
 	}
 	
 }
