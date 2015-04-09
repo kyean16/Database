@@ -22,6 +22,7 @@ public class Test
 		
 		dbm.commit();
 		
+		//Checks the NBA Team
 		NBATeam test = dbm.findNBATeamByName("Timberwolves");
 		System.out.println(test.getNbaTeamName());
 		

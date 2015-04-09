@@ -18,6 +18,11 @@ public class NBATeamDAO
 		this.dbm = dbm;
 	}
 	
+	/**
+	 * Create table
+	 * @param conn
+	 * @throws SQLException
+	 */
 	static void create(Connection conn) throws SQLException {
 		Statement stmt = conn.createStatement();
 		
@@ -28,6 +33,16 @@ public class NBATeamDAO
 		System.out.println("NBATEAM created");
 	}
 	
+	/**
+	 * Insert nbaTeam to table
+	 * @param nbaTeamID
+	 * @param teamName
+	 * @param teamCoach
+	 * @param nbaTeamWins
+	 * @param nbaTeamLosses
+	 * @param nbaSeason
+	 * @return
+	 */
 	public NBATeam insert(int nbaTeamID, String teamName, String teamCoach, int nbaTeamWins,int nbaTeamLosses, int nbaSeason) {
 		try {
 			
@@ -50,6 +65,10 @@ public class NBATeamDAO
 		}
 	}
 
+	/**
+	 * Deletes all the content of the Table
+	 * @throws SQLException
+	 */
 	void clear() throws SQLException {
 		Statement stmt = conn.createStatement();
 		String s = "delete from NBATEAM";

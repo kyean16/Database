@@ -11,9 +11,6 @@ import models.NBATeam;
 
 import org.apache.derby.jdbc.EmbeddedDriver;
 
-
-
-
 public class DatabaseManager {
 	
 	private Driver driver;

@@ -16,6 +16,16 @@ public class NBATeam
 	private int nbaTeamLosses;
 	private int nbaSeason;
 	
+	/**
+	 * Constructor sets up data
+	 * @param dao
+	 * @param nbaTeamID
+	 * @param nbaTeamName
+	 * @param teamCoach
+	 * @param nbaTeamWins
+	 * @param nbaTeamLosses
+	 * @param nbaSeason
+	 */
 	public NBATeam(NBATeamDAO dao, int nbaTeamID, String nbaTeamName,
 			String teamCoach, int nbaTeamWins, int nbaTeamLosses, int nbaSeason)
 	{
