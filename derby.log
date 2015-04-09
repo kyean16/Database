@@ -1,0 +1,51 @@
+Thu Apr 09 01:10:23 EDT 2015 Thread[main,5,main] Cleanup action starting
+java.sql.SQLException: Database 'Testing2' not found.
+	at org.apache.derby.impl.jdbc.SQLExceptionFactory40.getSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.Util.newEmbedSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.Util.newEmbedSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.Util.generateCsSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection.newSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection.handleDBNotFound(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection.<init>(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection30.<init>(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection40.<init>(Unknown Source)
+	at org.apache.derby.jdbc.Driver40.getNewEmbedConnection(Unknown Source)
+	at org.apache.derby.jdbc.InternalDriver.connect(Unknown Source)
+	at org.apache.derby.jdbc.EmbeddedDriver.connect(Unknown Source)
+	at dao.DatabaseManager.<init>(DatabaseManager.java:39)
+	at Testers.Test.main(Test.java:13)
+Caused by: java.sql.SQLException: Database 'Testing2' not found.
+	at org.apache.derby.impl.jdbc.SQLExceptionFactory.getSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.SQLExceptionFactory40.wrapArgsForTransportAcrossDRDA(Unknown Source)
+	... 14 more
+============= begin nested exception, level (1) ===========
+java.sql.SQLException: Database 'Testing2' not found.
+	at org.apache.derby.impl.jdbc.SQLExceptionFactory.getSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.SQLExceptionFactory40.wrapArgsForTransportAcrossDRDA(Unknown Source)
+	at org.apache.derby.impl.jdbc.SQLExceptionFactory40.getSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.Util.newEmbedSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.Util.newEmbedSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.Util.generateCsSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection.newSQLException(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection.handleDBNotFound(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection.<init>(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection30.<init>(Unknown Source)
+	at org.apache.derby.impl.jdbc.EmbedConnection40.<init>(Unknown Source)
+	at org.apache.derby.jdbc.Driver40.getNewEmbedConnection(Unknown Source)
+	at org.apache.derby.jdbc.InternalDriver.connect(Unknown Source)
+	at org.apache.derby.jdbc.EmbeddedDriver.connect(Unknown Source)
+	at dao.DatabaseManager.<init>(DatabaseManager.java:39)
+	at Testers.Test.main(Test.java:13)
+============= end nested exception, level (1) ===========
+Cleanup action completed
+----------------------------------------------------------------
+Thu Apr 09 01:10:23 EDT 2015:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.7.1.1 - (1040133): instance a816c00e-014c-9c96-1198-00000326f6e8 
+on database directory /Users/kevinyean/Documents/workspace/Implementation/Testing2  with class loader sun.misc.Launcher$AppClassLoader@4554617c 
+Loaded from file:/Users/kevinyean/Documents/workspace/Implementation/derby.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_40-b26
+Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Thu Apr 09 01:10:25 EDT 2015:
+Shutting down instance a816c00e-014c-9c96-1198-00000326f6e8 on database directory /Users/kevinyean/Documents/workspace/Implementation/Testing2 with class loader sun.misc.Launcher$AppClassLoader@4554617c 
