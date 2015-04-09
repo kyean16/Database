@@ -80,7 +80,7 @@ public class NBAPlayerDAO
 			return nbaPlayer;
 		} catch (SQLException e) {
 			dbm.cleanup();
-			throw new RuntimeException("error inserting new Team", e);
+			throw new RuntimeException("error inserting new Player", e);
 		}
 	}
 	
@@ -115,7 +115,7 @@ public class NBAPlayerDAO
 			return player;
 		} catch (SQLException e) {
 			dbm.cleanup();
-			throw new RuntimeException("error finding faculty", e);
+			throw new RuntimeException("error finding Player", e);
 		}
 	}
 

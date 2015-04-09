@@ -13,11 +13,11 @@ public class NBATeam
 	private int nbaTeamID;
 	private String nbaTeamName;
 	private String teamCoach;
-	private int nbaTeamWins;
-	private int nbaTeamLosses;
+
 	private int nbaSeason;
 	
 	private Collection<NBAPlayer> players;
+	private Collection<NBAGame> totalgames;
 	
 	/**
 	 * Constructor sets up data
@@ -25,19 +25,16 @@ public class NBATeam
 	 * @param nbaTeamID
 	 * @param nbaTeamName
 	 * @param teamCoach
-	 * @param nbaTeamWins
-	 * @param nbaTeamLosses
+
 	 * @param nbaSeason
 	 */
 	public NBATeam(NBATeamDAO dao, int nbaTeamID, String nbaTeamName,
-			String teamCoach, int nbaTeamWins, int nbaTeamLosses, int nbaSeason)
+			String teamCoach, int nbaSeason)
 	{
 		this.dao = dao;
 		this.nbaTeamID = nbaTeamID;
 		this.nbaTeamName = nbaTeamName;
 		this.teamCoach = teamCoach;
-		this.nbaTeamWins = nbaTeamWins;
-		this.nbaTeamLosses = nbaTeamLosses;
 		this.nbaSeason = nbaSeason;
 	}
 	
@@ -50,16 +47,6 @@ public class NBATeam
 	public String getTeamCoach()
 	{
 		return teamCoach;
-	}
-	
-	public int getNbaTeamWins()
-	{
-		return nbaTeamWins;
-	}
-	
-	public int getNbaTeamLosses()
-	{
-		return nbaTeamLosses;
 	}
 	
 	public int getNbaSeason()
@@ -83,4 +70,9 @@ public class NBATeam
 		return players;
 	}
 	
+	public Collection <NBAGame> getGames()
+	{
+		if(totalgames == null) totalgames = dao.getNBAGames(nbaTeamID);
+		return totalgames;
+	}
 }

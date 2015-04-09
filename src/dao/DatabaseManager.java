@@ -7,8 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import models.NBAPlayer;
-import models.NBATeam;
+import models.*;
 
 import org.apache.derby.jdbc.EmbeddedDriver;
 
@@ -20,8 +19,9 @@ public class DatabaseManager {
 	
 	private NBATeamDAO nbaTeamDAO;
 	private NBAPlayerDAO nbaPlayerDAO;
+	private NBAGameDAO nbaGameDAO;
 	
-	private final String url = "jdbc:derby:7";
+	private final String url = "jdbc:derby:3";
 
 	/**
 	 * Open Database
@@ -57,6 +57,7 @@ public class DatabaseManager {
 		
 		nbaTeamDAO = new NBATeamDAO(conn, this);
 		nbaPlayerDAO = new NBAPlayerDAO(conn,this);
+		nbaGameDAO = new NBAGameDAO(conn,this);
 		
 		
 		
@@ -73,13 +74,14 @@ public class DatabaseManager {
 		NBATeamDAO.create(conn);
 		NBAPlayerDAO.create(conn);
 		NBAPlayerDAO.addConstraints(conn);
+		NBAGameDAO.create(conn);
 		conn.commit();
 	}
 	
 	//*****************************************************************
 		//Insert Function
-	public NBATeam insertNBATeam(int nbaTeamID, String nbaTeamName, String teamCoach, int nbaTeamWins,int nbaTeamLosses, int nbaSeason) {
-		return nbaTeamDAO.insert(nbaTeamID, nbaTeamName, teamCoach, nbaTeamWins,nbaTeamLosses,nbaSeason);
+	public NBATeam insertNBATeam(int nbaTeamID, String nbaTeamName, String teamCoach, int nbaSeason) {
+		return nbaTeamDAO.insert(nbaTeamID, nbaTeamName, teamCoach,nbaSeason);
 	}
 	
 	public NBAPlayer insertNBAPlayer(int nbaPlayerID, String nbaPlayerName, NBATeam nbaPlayerTeamID, 
@@ -87,6 +89,12 @@ public class DatabaseManager {
 			String nbaPlayerHometown, String nbaPlayerPosition){
 		return nbaPlayerDAO.insert(nbaPlayerID,  nbaPlayerName, nbaPlayerTeamID,
 				nbaPlayerSalary, nbaPlayerHealthStatus, nbaPlayerAge, nbaPlayerHometown, nbaPlayerPosition);
+	}
+	
+	public NBAGame insertNBAGame(int nbaGameID, NBATeam nbaGameAwayTeam, NBATeam nbaGameHomeTeam, int nbaGameAwayScore,
+			int nbaGameHomeScore,int nbaGameSeason){
+		return nbaGameDAO.insert(nbaGameID, nbaGameAwayTeam, nbaGameHomeTeam,nbaGameAwayScore,
+				nbaGameHomeScore,nbaGameSeason);
 	}
 	
 	//****************************************************************
@@ -108,7 +116,10 @@ public class DatabaseManager {
 	public NBAPlayer findNBAPlayer(int id) {
 		return nbaPlayerDAO.findbyID(id);
 	}
-	
+
+	public NBAGame findNBAGame(int id){
+		return nbaGameDAO.findByID(id);
+	}
 	//***************************************************************
 		// Utility functions
 		
@@ -169,6 +180,7 @@ public class DatabaseManager {
 				// of the cyclic foreign keys -- I had to play with
 				// "on delete set null" and "on delete cascade" for a bit
 				
+				nbaGameDAO.clear();
 				nbaPlayerDAO.clear();
 				nbaTeamDAO.clear();
 				

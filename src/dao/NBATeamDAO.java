@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import models.NBAGame;
 import models.NBAPlayer;
 import models.NBATeam;
 
@@ -30,7 +31,7 @@ public class NBATeamDAO
 		Statement stmt = conn.createStatement();
 		
 		String s = "create table NBATEAM(" + "NbaTeamID int, " + "NbaTeamName varchar(30)," + "TeamCoach varchar(30), "
-				+ "nbaTeamWins int, " + "nbaTeamLosses int, " + "nbaSeason int,"
+				+ "nbaSeason int,"
 				+ "primary key(NbaTeamID))";
 		stmt.executeUpdate(s);
 		System.out.println("NBATEAM created");
@@ -41,26 +42,22 @@ public class NBATeamDAO
 	 * @param nbaTeamID
 	 * @param teamName
 	 * @param teamCoach
-	 * @param nbaTeamWins
-	 * @param nbaTeamLosses
 	 * @param nbaSeason
 	 * @return
 	 */
-	public NBATeam insert(int nbaTeamID, String teamName, String teamCoach, int nbaTeamWins,int nbaTeamLosses, int nbaSeason) {
+	public NBATeam insert(int nbaTeamID, String teamName, String teamCoach, int nbaSeason) {
 		try {
 			
-			String cmd = "insert into NBATEAM(NbaTeamID,NbaTeamName, TeamCoach, nbaTeamWins, nbaTeamLosses, nbaSeason) "
-					+ "values(?, ?, ?, ?, ? ,?)";
+			String cmd = "insert into NBATEAM(NbaTeamID,NbaTeamName, TeamCoach, nbaSeason) "
+					+ "values(?, ?, ?, ?)";
 			PreparedStatement pstmt = conn.prepareStatement(cmd);
 			pstmt.setInt(1, nbaTeamID);
 			pstmt.setString(2, teamName);
 			pstmt.setString(3, teamCoach);
-			pstmt.setInt(4, nbaTeamWins);
-			pstmt.setInt(5,nbaTeamLosses);
-			pstmt.setInt(6,nbaSeason);
+			pstmt.setInt(4,nbaSeason);
 			pstmt.executeUpdate();
 
-			NBATeam nbaTeam = new NBATeam(this,nbaTeamID,teamName, teamCoach, nbaTeamWins,nbaTeamLosses,nbaSeason);
+			NBATeam nbaTeam = new NBATeam(this,nbaTeamID,teamName, teamCoach,nbaSeason);
 			return nbaTeam;
 		} catch (SQLException e) {
 			dbm.cleanup();
@@ -77,7 +74,8 @@ public class NBATeamDAO
 		String s = "delete from NBATEAM";
 		stmt.executeUpdate(s);
 	}
-	
+	//********************************************************Find
+	 
 	/**
 	 * Retrieve a NBATeam object by name. 
 	 * 
@@ -98,13 +96,11 @@ public class NBATeamDAO
 			int id = rs.getInt("NbaTeamID");
 			String nbaName = rs.getString("NbaTeamName");
 			String nbaCoach = rs.getString("TeamCoach");
-			int wins = rs.getInt("NbaTeamWins");
-			int losses = rs.getInt("NbaTeamlosses");
 			int season = rs.getInt("NbaSeason");
 			
 			rs.close();
 			
-			NBATeam team = new NBATeam(this,id, nbaName, nbaCoach,wins,losses,season);
+			NBATeam team = new NBATeam(this,id, nbaName, nbaCoach,season);
 
 			return team;
 		} catch (SQLException e) {
@@ -132,39 +128,59 @@ public class NBATeamDAO
 			int teamID = rs.getInt("NbaTeamID");
 			String nbaName = rs.getString("NbaTeamName");
 			String nbaCoach = rs.getString("TeamCoach");
-			int wins = rs.getInt("NbaTeamWins");
-			int losses = rs.getInt("NbaTeamlosses");
 			int season = rs.getInt("NbaSeason");
 			
 			rs.close();
 			
-			NBATeam team = new NBATeam(this,teamID, nbaName, nbaCoach,wins,losses,season);
+			NBATeam team = new NBATeam(this,teamID, nbaName, nbaCoach,season);
 
 			return team;
 		} catch (SQLException e) {
 			dbm.cleanup();
-			throw new RuntimeException("error finding department by name", e);
+			throw new RuntimeException("error finding team by id", e);
 		}
 	}
 	
-	
+	//****************************Get
 	public Collection<NBAPlayer> getNBAPlayers(int teamNameID) {
 		try {
-			Collection<NBAPlayer> faculty = new ArrayList<NBAPlayer>();
+			Collection<NBAPlayer> player = new ArrayList<NBAPlayer>();
 			String qry = "select nbaPlayerID from NBAPLAYER where nbaPlayerTeamID = ?";
 			PreparedStatement pstmt = conn.prepareStatement(qry);
 			pstmt.setInt(1, teamNameID);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				int id = rs.getInt("nbaPlayerID");
-				faculty.add(dbm.findNBAPlayer(id));
+				player.add(dbm.findNBAPlayer(id));
 			}
 			rs.close();
-			return faculty;
+			return player;
 		}
 		catch(SQLException e) {
 			dbm.cleanup();
-			throw new RuntimeException("error getting department faculty", e);
+			throw new RuntimeException("error getting Team Players", e);
+		}
+	}
+	
+	public Collection <NBAGame> getNBAGames(int id)
+	{
+		try{
+			Collection<NBAGame> game = new ArrayList<NBAGame>();
+			String qry = "select NbaGameID from NBAGAME where NbaGameAwayTeam =? OR NbaGameHomeTeam =?";
+			PreparedStatement pstmt = conn.prepareStatement(qry);
+			pstmt.setInt(1,id);
+			pstmt.setInt(2,id);
+			ResultSet rs = pstmt.executeQuery();
+			while(rs.next()){
+				int gameId = rs.getInt("nbaGameID");
+				game.add(dbm.findNBAGame(gameId));
+			}
+			rs.close();
+			return game;
+		}
+		catch(SQLException e){
+			dbm.cleanup();
+			throw new RuntimeException("error getting Team Games");
 		}
 	}
 	
