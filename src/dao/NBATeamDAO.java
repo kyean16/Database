@@ -23,18 +23,23 @@ public class NBATeamDAO
 	}
 	
 	/**
-	 * Create table
+	 * Create Team Table
 	 * @param conn
 	 * @throws SQLException
 	 */
 	static void create(Connection conn) throws SQLException {
+			
 		Statement stmt = conn.createStatement();
 		
-		String s = "create table NBATEAM(" + "NbaTeamID int, " + "NbaTeamName varchar(30)," + "TeamCoach varchar(30), "
-				+ "nbaSeason int,"
-				+ "primary key(NbaTeamID))";
+		String s = "create table NBATEAM(" 
+				+ "NbaTeamID int not null, " //Key 
+				+ "NbaTeamName varchar(30) not null," 
+				+ "TeamCoach varchar(30), "
+				+ "nbaSeason int not null,"
+				+ "check (nbaSeason >= 1946)," //Founding Date of the NBA
+				+ "primary key(NbaTeamID))"; //Primary Key
 		stmt.executeUpdate(s);
-		System.out.println("NBATEAM created");
+		System.out.println("NBATEAM Table created");
 	}
 	
 	/**
@@ -48,7 +53,11 @@ public class NBATeamDAO
 	public NBATeam insert(int nbaTeamID, String teamName, String teamCoach, int nbaSeason) {
 		try {
 			
-			String cmd = "insert into NBATEAM(NbaTeamID,NbaTeamName, TeamCoach, nbaSeason) "
+			String cmd = "insert into NBATEAM("
+					+ "NbaTeamID,"
+					+ "NbaTeamName, "
+					+ "TeamCoach, "
+					+ "nbaSeason) "
 					+ "values(?, ?, ?, ?)";
 			PreparedStatement pstmt = conn.prepareStatement(cmd);
 			pstmt.setInt(1, nbaTeamID);
@@ -64,7 +73,6 @@ public class NBATeamDAO
 			throw new RuntimeException("error inserting new Team", e);
 		}
 	}
-
 	/**
 	 * Deletes all the content of the Table
 	 * @throws SQLException
@@ -77,7 +85,7 @@ public class NBATeamDAO
 	//********************************************************Find
 	 
 	/**
-	 * Retrieve a NBATeam object by name. 
+	 * Retrieve a NBATeam by name. 
 	 * 
 	 * @param name
 	 * @return the NBATeam object, or null if not found
@@ -89,7 +97,7 @@ public class NBATeamDAO
 			pstmt.setString(1, name);
 			ResultSet rs = pstmt.executeQuery();
 
-			// return null if faculty member doesn't exist
+			// return null if NBATeam doesn't exist
 			if (!rs.next())
 				return null;
 
@@ -105,7 +113,7 @@ public class NBATeamDAO
 			return team;
 		} catch (SQLException e) {
 			dbm.cleanup();
-			throw new RuntimeException("error finding department by name", e);
+			throw new RuntimeException("error finding Team by name", e);
 		}
 	}
 	
@@ -121,7 +129,7 @@ public class NBATeamDAO
 			pstmt.setInt(1, id);
 			ResultSet rs = pstmt.executeQuery();
 
-			// return null if faculty member doesn't exist
+			// return null if NBATeam doesn't exist
 			if (!rs.next())
 				return null;
 
@@ -137,15 +145,22 @@ public class NBATeamDAO
 			return team;
 		} catch (SQLException e) {
 			dbm.cleanup();
-			throw new RuntimeException("error finding team by id", e);
+			throw new RuntimeException("error finding Team by id", e);
 		}
 	}
 	
 	//****************************Get
+	/**
+	 * Get allNbaPlayer on a Team
+	 * @param teamNameID
+	 * @return
+	 */
 	public Collection<NBAPlayer> getNBAPlayers(int teamNameID) {
 		try {
 			Collection<NBAPlayer> player = new ArrayList<NBAPlayer>();
-			String qry = "select nbaPlayerID from NBAPLAYER where nbaPlayerTeamID = ?";
+			String qry = "select nbaPlayerID "
+						+"from NBAPLAYER "
+						+"where nbaPlayerTeamID = ?";
 			PreparedStatement pstmt = conn.prepareStatement(qry);
 			pstmt.setInt(1, teamNameID);
 			ResultSet rs = pstmt.executeQuery();
@@ -162,11 +177,18 @@ public class NBATeamDAO
 		}
 	}
 	
+	/**
+	 * Get All Games played by a Team
+	 * @param id
+	 * @return
+	 */
 	public Collection <NBAGame> getNBAGames(int id)
 	{
 		try{
 			Collection<NBAGame> game = new ArrayList<NBAGame>();
-			String qry = "select NbaGameID from NBAGAME where NbaGameAwayTeam =? OR NbaGameHomeTeam =?";
+			String qry = "select NbaGameID "
+						+"from NBAGAME "
+						+"where NbaGameAwayTeam =? OR NbaGameHomeTeam =?";
 			PreparedStatement pstmt = conn.prepareStatement(qry);
 			pstmt.setInt(1,id);
 			pstmt.setInt(2,id);
@@ -184,24 +206,58 @@ public class NBATeamDAO
 		}
 	}
 	
+	/**
+	 * Get teams with less or equal to max players
+	 * @param max
+	 * @return
+	 */
+	public Collection <NBATeam> getTeamNumberPlayer(int max)
+	{
+		try{
+			Collection<NBATeam> teams = new ArrayList<NBATeam>();
+			String qry = "select t.* "
+						+"from NBATEAM t "
+						+"where ? >=  (" 
+						+ 	"select count(*)"
+						+ 	"from NBAPlayer "
+						+ 	"where NbaPlayerTeamID = t.nbaTeamID)";
+			PreparedStatement pstmt = conn.prepareStatement(qry);
+			pstmt.setInt(1,max);
+			ResultSet rs = pstmt.executeQuery();;
+			while ( rs.next())
+			{
+				int teamID = rs.getInt("nbaTeamID");
+				teams.add(dbm.findNBATeambyID(teamID));
+			}
+			rs.close();
+			return teams;
+		} catch (SQLException e) {
+			dbm.cleanup();
+			throw new RuntimeException("error ", e);
+		}
+	}
+	
+	/**
+	 * Get the Total Number of Teams
+	 * @return
+	 */
 	public int getTeamNumber()
 	{
 		try{
-			
-		String qry = "select * from NBATEAM";
-		PreparedStatement pstmt = conn.prepareStatement(qry);
-		ResultSet rs = pstmt.executeQuery();
-		int rowCount = 0;
-		while ( rs.next() )
-		{
-		    // Process the row.
-		    rowCount++;
+			String qry = "select * from NBATEAM";
+			PreparedStatement pstmt = conn.prepareStatement(qry);
+			ResultSet rs = pstmt.executeQuery();
+			int rowCount = 0;
+			while ( rs.next() )
+			{
+			    // Process the row.
+			    rowCount++;
+			}
+			rs.close();
+			return rowCount;
+		} catch (SQLException e) {
+			dbm.cleanup();
+			throw new RuntimeException("error ", e);
 		}
-		rs.close();
-		return rowCount;
-	} catch (SQLException e) {
-		dbm.cleanup();
-		throw new RuntimeException("error ", e);
 	}
-}
 }

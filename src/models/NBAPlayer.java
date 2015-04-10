@@ -35,11 +35,7 @@ public class NBAPlayer
 		
 	}
 	
-	public String toString()
-	{
-		return "Player: " + nbaPlayerName;
-	}
-	
+	//**************Getters
 	public String getName()
 	{
 		return nbaPlayerName;
@@ -54,10 +50,20 @@ public class NBAPlayer
 	{
 		return nbaPlayerTeamID;
 	}
+	
+	public int getAge()
+	{
+		return nbaPlayerAge;
+	}
+	
+	public String toString()
+	{
+		return "Player: " + nbaPlayerName;
+	}
 
 	public Collection<GameLog> findAgainstLogs(NBATeam against)
 	{
-		if(logs == null) logs = dao.getNBAGames(against, this);
+		if(logs == null) logs = dao.getNBAGamesPlayedAgainst(against, this);
 		return logs;
 	}
 }

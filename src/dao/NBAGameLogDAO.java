@@ -33,20 +33,44 @@ public class NBAGameLogDAO {
 	static void create(Connection conn) throws SQLException {
 		Statement stmt = conn.createStatement();
 		String s = "create table GAMELOG("
-				+ "NbaGameID int, "
-				+ "NbaPlayer int, "
-				+ "NbaGameLogID int, "
-				+ "NbaGameLogPoints int, "
-				+ "NbaGameLogRebounds int,"
-				+ "NbaGameLogAssists int,"
-				+ "NbaGameLogSteals int,"
-				+ "NbaGameLogFouls int,"
-				+ "NbaGameLogMinutes int,"
+				+ "NbaGameID int not null, "
+				+ "NbaPlayer int not null, "
+				+ "NbaGameLogID int not null, "
+				+ "NbaGameLogPoints int not null, "
+				+ "NbaGameLogRebounds int not null,"
+				+ "NbaGameLogAssists int not null,"
+				+ "NbaGameLogSteals int not null,"
+				+ "NbaGameLogFouls int not null,"
+				+ "NbaGameLogMinutes int not null,"
+				+ "check (NbaGameLogFouls <= 6 AND NbaGameLogFouls >= 0),"
 				+ "primary key(NbaGameLogID))";
+		stmt.executeUpdate(s);
+	}
+	
+	static void addConstraints(Connection conn) throws SQLException {
+		Statement stmt = conn.createStatement();
+		String s = "alter table GAMELOG add constraint fk_LogGame "
+				+ "foreign key(NbaGameID) references NBAGame";
+		stmt.executeUpdate(s);
+		s = "alter table GAMELOG add constraint fk_LogPlayer "
+				+ "foreign key(NbaPlayer) references NBAPlayer";
 		stmt.executeUpdate(s);
 		System.out.println("GAMELOG created");
 	}
 	
+	/**
+	 * Insert Game Log to Table
+	 * @param nbaGameID
+	 * @param nbaPlayerID
+	 * @param nbaGameLogID
+	 * @param nbaGameLogPoints
+	 * @param nbaGameLogRebounds
+	 * @param nbaGameLogAssists
+	 * @param nbaGameLogSteals
+	 * @param nbaGameLogFouls
+	 * @param nbaGameLogMinutes
+	 * @return
+	 */
 	public GameLog insert(NBAGame nbaGameID, NBAPlayer nbaPlayerID, int nbaGameLogID, int nbaGameLogPoints,
 	int nbaGameLogRebounds, int nbaGameLogAssists, int nbaGameLogSteals, int nbaGameLogFouls, int nbaGameLogMinutes) {
 		try {
@@ -55,7 +79,7 @@ public class NBAGameLogDAO {
 					+ " NbaGameID,"
 					+ " NbaPlayer,"
 					+ " NbaGameLogID,"
-					+ " NbaGameLogPoints, "
+					+ " NbaGameLogPoints,"
 					+ " NbaGameLogRebounds,"
 					+ " NbaGameLogAssists,"
 					+ " NbaGameLogSteals,"
@@ -84,17 +108,24 @@ public class NBAGameLogDAO {
 		}
 	}
 	
+	/**
+	 * Find GameLog ny ID
+	 * @param id
+	 * @return
+	 */
 	public GameLog findByID(int id)
 	{
 		if (cache.containsKey(id)) return cache.get(id);
 		
 		try {
-			String qry = "select * from GAMELOG where NbaGameLogID = ?";
+			String qry = "select * "        //Select all gamelogs with the same gameLogIn
+						+"from GAMELOG "
+						+"where NbaGameLogID = ?";
 			PreparedStatement pstmt = conn.prepareStatement(qry);
 			pstmt.setInt(1, id);
 			ResultSet rs = pstmt.executeQuery();
 
-			// return null if faculty doesn't exist
+			// return null if GameLog doesn't exist
 			if (!rs.next())
 				return null;
 			
@@ -118,7 +149,7 @@ public class NBAGameLogDAO {
 			return log;
 		} catch (SQLException e) {
 			dbm.cleanup();
-			throw new RuntimeException("error finding Player", e);
+			throw new RuntimeException("error finding GameLog", e);
 		}
 	}
 	

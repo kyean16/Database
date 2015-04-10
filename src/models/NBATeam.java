@@ -63,6 +63,11 @@ public class NBATeam
 	{
 		return "Team:" + nbaTeamName + ",Coach:" + teamCoach + ",Season:" + nbaSeason; 
 	}
+	
+	public int getAmountPlayers()
+	{
+		return players.size();
+	}
 
 	public Collection<NBAPlayer> getPlayers()
 	{

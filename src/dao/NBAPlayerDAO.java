@@ -38,34 +38,52 @@ public class NBAPlayerDAO
 	static void create(Connection conn) throws SQLException {
 		Statement stmt = conn.createStatement();
 		String s = "create table NBAPLAYER("
-				+ "NbaPlayerID int, "
+				+ "NbaPlayerID int not null, "
 				+ "NbaPlayerName varchar(30) not null, "
-				+ "NbaPlayerTeamID int not null, "
-				+ "NbaPlayerSalary int, "
+				+ "NbaPlayerTeamID int, "
+				+ "NbaPlayerSalary int not null, "
 				+ "NbaPlayerHealthStatus varchar(30),"
 				+ "NbaPlayerAge int,"
 				+ "NbaPlayerHometown varchar(30),"
 				+ "NbaPlayerPosition varchar(30),"
+				+ "check (nbaPlayerSalary >= 0),"
+				+ "check (nbaPlayerAge > 0),"
 				+ "primary key(NbaPlayerID))";
 		stmt.executeUpdate(s);
-		System.out.println("NBAPLAYER created");
+		System.out.println("NBAPLAYER Table created");
 	}
 	static void addConstraints(Connection conn) throws SQLException {
 		Statement stmt = conn.createStatement();
-		String s = "alter table NBAPLAYER add constraint fk_facdept "
-				+ "foreign key(NbaPlayerTeamID) references NBATEAM ";
+		String s = "alter table NBAPLAYER add constraint fk_PlayerTeam "
+				+ "foreign key(NbaPlayerTeamID) references NBATEAM";
 		stmt.executeUpdate(s);
 	}
 	
+	/**
+	 * Insert a new element in the table
+	 * @param nbaPlayerID
+	 * @param nbaPlayerName
+	 * @param nbaPlayerTeamID
+	 * @param nbaPlayerSalary
+	 * @param nbaPlayerHealthStatus
+	 * @param nbaPlayerAge
+	 * @param nbaPlayerHomeTown
+	 * @param nbaPlayerPosition
+	 * @return
+	 */
 	public NBAPlayer insert(int nbaPlayerID, String nbaPlayerName, NBATeam nbaPlayerTeamID, int nbaPlayerSalary,
 			String nbaPlayerHealthStatus,int nbaPlayerAge, String nbaPlayerHomeTown, String nbaPlayerPosition) {
 		try {
 			
-			String cmd = "insert into NBAPlayer(NbaPlayerID,NbaPlayerName, NbaPlayerTeamID, NbaPlayerSalary, NbaPlayerHealthStatus,"
+			String cmd = "insert into NBAPlayer(NbaPlayerID,"
+					+ " NbaPlayerName,"
+					+ " NbaPlayerTeamID,"
+					+ " NbaPlayerSalary,"
+					+ " NbaPlayerHealthStatus,"
 					+ " NbaPlayerAge,"
 					+ " NbaPlayerHometown,"
 					+ " NbaPlayerPosition) "
-					+ "values(?, ?, ?, ?, ? ,?,?,?)";
+					+ "values(?, ?, ?, ?, ?, ?, ?, ?)";
 			PreparedStatement pstmt = conn.prepareStatement(cmd);
 			pstmt.setInt(1, nbaPlayerID);
 			pstmt.setString(2, nbaPlayerName);
@@ -87,7 +105,13 @@ public class NBAPlayerDAO
 		}
 	}
 
-	public Collection<GameLog> getNBAGames(NBATeam against, NBAPlayer player)
+	/**
+	 * Return all Games played against a specific team and the current team of the player.
+	 * @param against
+	 * @param player
+	 * @return
+	 */
+	public Collection<GameLog> getNBAGamesPlayedAgainst(NBATeam against, NBAPlayer player)
 	{
 		try {
 			Collection<GameLog> log = new ArrayList<GameLog>();
@@ -108,14 +132,10 @@ public class NBAPlayerDAO
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
 				int id = rs.getInt("NbaGameLogID");
-				System.out.println(id);
 				log.add(dbm.findGame(id));
 			}
 			rs.close();
-			
-			//System.out.println("Team 1:" +player.getTeamID().getNbaTeamID());
-			//System.out.println("Team 2:" +  against.getNbaTeamID());
-			
+					
 			return log;
 		}
 		catch(SQLException e) {
@@ -124,18 +144,24 @@ public class NBAPlayerDAO
 		}
 	}
 
-	
+	/**
+	 * Find NbaPlayer by ID
+	 * @param id
+	 * @return
+	 */
 	public NBAPlayer findbyID(int id)
 	{
 		if (cache.containsKey(id)) return cache.get(id);
 		
 		try {
-			String qry = "select * from NBAPLAYER where NBAPlayerID = ?";
+			String qry = "select * "
+						+"from NBAPLAYER "
+						+"where NBAPlayerID = ?";
 			PreparedStatement pstmt = conn.prepareStatement(qry);
 			pstmt.setInt(1, id);
 			ResultSet rs = pstmt.executeQuery();
 
-			// return null if faculty doesn't exist
+			// return null if NBAPlayer doesn't exist
 			if (!rs.next())
 				return null;
 

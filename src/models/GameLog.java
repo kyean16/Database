@@ -34,4 +34,10 @@ public class GameLog {
 	  {
 		  return "Player:" +nbaPlayerID.getName() + ";Minutes:" + gameMinutes + ";Points:" + gamePoints;
 	  }
+	  
+	  //*** Getters
+	  public int getPoints()
+	  {
+		  return gamePoints;
+	  }
 }

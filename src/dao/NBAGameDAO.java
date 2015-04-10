@@ -34,17 +34,39 @@ public class NBAGameDAO {
 	static void create(Connection conn) throws SQLException {
 		Statement stmt = conn.createStatement();
 		String s = "create table NBAGAME("
-				+ "NbaGameID int, "
-				+ "NbaGameAwayTeam int, "
-				+ "NbaGameHomeTeam int, "
-				+ "NbaGameAwayScore int, "
-				+ "NbaGameHomeScore int,"
-				+ "NbaGameSeason int,"
+				+ "NbaGameID int not null, "
+				+ "NbaGameAwayTeam int not null, "
+				+ "NbaGameHomeTeam int not null, "
+				+ "NbaGameAwayScore int not null, "
+				+ "NbaGameHomeScore int not null,"
+				+ "NbaGameSeason int not null,"
+				+ "check (NbaGameAwayTeam != NbaGameHomeTeam)," //Cannot have a team play against itself
+				+ "check (NbaGameAwayScore != NbaGameHomeScore)," // Cannot have ties in the NBA 
 				+ "primary key(NbaGameID))";
+		stmt.executeUpdate(s);
+	}
+	
+	static void addConstraints(Connection conn) throws SQLException {
+		Statement stmt = conn.createStatement();
+		String s = "alter table NBAGAME add constraint fk_GameAway "
+				+ "foreign key(NbaGameAwayTeam) references NBATEAM";
+		stmt.executeUpdate(s);
+		s = "alter table NBAGAME add constraint fk_GameHome "
+				+ "foreign key(NbaGameHomeTeam) references NBATEAM";
 		stmt.executeUpdate(s);
 		System.out.println("NBAGAME created");
 	}
 	
+	/**
+	 * Insert NBAGame
+	 * @param nbaGameID
+	 * @param nbaGameAwayTeam
+	 * @param nbaGameHomeTeam
+	 * @param nbaGameAwayScore
+	 * @param nbaGameHomeScore
+	 * @param nbaGameSeason
+	 * @return
+	 */
 	public NBAGame insert(int nbaGameID, NBATeam nbaGameAwayTeam, NBATeam nbaGameHomeTeam, int nbaGameAwayScore,
 			int nbaGameHomeScore,int nbaGameSeason) {
 		try {
@@ -55,7 +77,7 @@ public class NBAGameDAO {
 					+ " NbaGameAwayScore, "
 					+ " NbaGameHomeScore,"
 					+ " NbaGameSeason)"
-					+ "values(?, ?, ?, ?, ? ,?)";
+					+ "values(?, ?, ?, ?,? ,?)";
 			PreparedStatement pstmt = conn.prepareStatement(cmd);
 			pstmt.setInt(1, nbaGameID);
 			pstmt.setInt(2, nbaGameAwayTeam.getNbaTeamID());
@@ -75,10 +97,17 @@ public class NBAGameDAO {
 		}
 	}
 	
+	/**
+	 * Find NBAGame by ID
+	 * @param id
+	 * @return
+	 */
 	public NBAGame findByID(int id)
 	{
 		try {
-			String qry = "select * from NBAGAME where NbaGameID = ?";
+			String qry = "select * "
+						+"from NBAGAME "
+						+"where NbaGameID = ?";
 			PreparedStatement pstmt = conn.prepareStatement(qry);
 			pstmt.setInt(1, id);
 			ResultSet rs = pstmt.executeQuery();
@@ -107,7 +136,6 @@ public class NBAGameDAO {
 			throw new RuntimeException("error finding Game by id", e);
 		}
 	}
-	
 	
 	void clear() throws SQLException {
 		Statement stmt = conn.createStatement();

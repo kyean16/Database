@@ -13,6 +13,16 @@ public class NBAGame
 	private int nbaGameHomeScore;
 	private int nbaGameSeason;
 	
+	/**
+	 * Constructor
+	 * @param dao
+	 * @param nbaGameID
+	 * @param nbaGameAwayTeam
+	 * @param nbaGameHomeTeam
+	 * @param nbaGameAwayScore
+	 * @param nbaGameHomeScore
+	 * @param nbaGameSeason
+	 */
 	public NBAGame(NBAGameDAO dao,int nbaGameID,NBATeam nbaGameAwayTeam,NBATeam nbaGameHomeTeam,
 			int nbaGameAwayScore, int nbaGameHomeScore, int nbaGameSeason)
 	{
@@ -29,12 +39,22 @@ public class NBAGame
 	{
 		return "Away Team:" + nbaGameAwayTeam.getNbaTeamName() + "(" + nbaGameAwayScore + ") Home Team: "
 				+ nbaGameHomeTeam.getNbaTeamName() + "(" 
-				+ nbaGameHomeScore + ")";
+				+ nbaGameHomeScore + ") In " + nbaGameSeason ;
 	}
 	
 	//**** Getters
 	public int getId()
 	{
 		return nbaGameID;
+	}
+	
+	public NBATeam getAwayTeam()
+	{
+		return nbaGameAwayTeam;
+	}
+	
+	public NBATeam getHomeTeam()
+	{
+		return nbaGameHomeTeam;
 	}
 }
