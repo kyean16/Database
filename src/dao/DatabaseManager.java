@@ -20,8 +20,9 @@ public class DatabaseManager {
 	private NBATeamDAO nbaTeamDAO;
 	private NBAPlayerDAO nbaPlayerDAO;
 	private NBAGameDAO nbaGameDAO;
+	private NBAGameLogDAO  nbaGameLogDAO;
 	
-	private final String url = "jdbc:derby:3";
+	private final String url = "jdbc:derby:r";
 
 	/**
 	 * Open Database
@@ -58,6 +59,7 @@ public class DatabaseManager {
 		nbaTeamDAO = new NBATeamDAO(conn, this);
 		nbaPlayerDAO = new NBAPlayerDAO(conn,this);
 		nbaGameDAO = new NBAGameDAO(conn,this);
+		nbaGameLogDAO = new NBAGameLogDAO(conn,this);
 		
 		
 		
@@ -75,6 +77,7 @@ public class DatabaseManager {
 		NBAPlayerDAO.create(conn);
 		NBAPlayerDAO.addConstraints(conn);
 		NBAGameDAO.create(conn);
+		NBAGameLogDAO.create(conn);
 		conn.commit();
 	}
 	
@@ -95,6 +98,13 @@ public class DatabaseManager {
 			int nbaGameHomeScore,int nbaGameSeason){
 		return nbaGameDAO.insert(nbaGameID, nbaGameAwayTeam, nbaGameHomeTeam,nbaGameAwayScore,
 				nbaGameHomeScore,nbaGameSeason);
+	}
+	
+	public GameLog insertNBALog(NBAGame nbaGameID, NBAPlayer nbaPlayerID, int nbaGameLogID, int nbaGameLogPoints,
+			int nbaGameLogRebounds, int nbaGameLogAssists, int nbaGameSteals, int nbaGameFouls, int nbaGameLogMinutes)
+	{
+		return nbaGameLogDAO.insert(nbaGameID, nbaPlayerID, nbaGameLogID, nbaGameLogPoints,
+				nbaGameLogRebounds, nbaGameLogAssists, nbaGameSteals, nbaGameFouls, nbaGameLogMinutes);
 	}
 	
 	//****************************************************************
@@ -119,6 +129,15 @@ public class DatabaseManager {
 
 	public NBAGame findNBAGame(int id){
 		return nbaGameDAO.findByID(id);
+	}
+	
+	public GameLog findGame(int id){
+		return nbaGameLogDAO.findByID(id);
+	}
+	
+	//public GameLog findAgainstLogs(NBATeam against,NBAPlayer nbaPlayerID)
+	{
+		//return nbaGameLogDAO.findBy(against,nbaPlayerID)
 	}
 	//***************************************************************
 		// Utility functions
@@ -180,6 +199,7 @@ public class DatabaseManager {
 				// of the cyclic foreign keys -- I had to play with
 				// "on delete set null" and "on delete cascade" for a bit
 				
+				nbaGameLogDAO.clear();
 				nbaGameDAO.clear();
 				nbaPlayerDAO.clear();
 				nbaTeamDAO.clear();

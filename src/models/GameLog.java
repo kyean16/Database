@@ -15,5 +15,23 @@ public class GameLog {
 	  private int gameFouls;
 	  private int gameMinutes;
 	  
+	  public GameLog(NBAGameLogDAO dao,NBAGame nbaGameID,NBAPlayer nbaPlayerID, int gameLogID, int gamePoints,
+			  int gameRebounds, int gameAssists,int gameSteals, int gameFouls, int gameMinutes)
+			  {
+		  		this.dao = dao;
+		  		this.nbaGameID = nbaGameID;
+		  		this.nbaPlayerID = nbaPlayerID;
+		  		this.gameLogID = gameLogID;
+		  		this.gamePoints = gamePoints;
+		  		this.gameRebounds = gameRebounds;
+		  		this.gameAssists = gameAssists;
+		  		this.gameSteals = gameSteals;
+		  		this.gameFouls = gameFouls;
+		  		this.gameMinutes = gameMinutes;
+			  }
 	  
+	  public String toString()
+	  {
+		  return "Player:" +nbaPlayerID.getName() + ";Minutes:" + gameMinutes + ";Points:" + gamePoints;
+	  }
 }

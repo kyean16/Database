@@ -1,5 +1,7 @@
 package models;
 
+import java.util.Collection;
+
 import dao.NBAPlayerDAO;
 
 
@@ -14,6 +16,8 @@ public class NBAPlayer
 	private int nbaPlayerAge;
 	private String nbaPlayerHometown;
 	private String nbaPlayerPosition;
+	
+	private Collection<GameLog> logs;
 	
 	public NBAPlayer(NBAPlayerDAO dao, int nbaPlayerID, String nbaPlayerName, NBATeam nbaPlayerTeamID, 
 			int nbaPlayerSalary, String nbaPlayerHealthStatus, int nbaPlayerAge, 
@@ -35,5 +39,25 @@ public class NBAPlayer
 	{
 		return "Player: " + nbaPlayerName;
 	}
+	
+	public String getName()
+	{
+		return nbaPlayerName;
+	}
+	
+	public int getID()
+	{
+		return nbaPlayerID;
+	}
+	
+	public NBATeam getTeamID()
+	{
+		return nbaPlayerTeamID;
+	}
 
+	public Collection<GameLog> findAgainstLogs(NBATeam against)
+	{
+		if(logs == null) logs = dao.getNBAGames(against, this);
+		return logs;
+	}
 }

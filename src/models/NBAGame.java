@@ -31,4 +31,10 @@ public class NBAGame
 				+ nbaGameHomeTeam.getNbaTeamName() + "(" 
 				+ nbaGameHomeScore + ")";
 	}
+	
+	//**** Getters
+	public int getId()
+	{
+		return nbaGameID;
+	}
 }

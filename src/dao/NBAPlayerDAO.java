@@ -5,10 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-
+import models.GameLog;
+import models.NBAGame;
 import models.NBAPlayer;
 import models.NBATeam;
 
@@ -83,6 +86,44 @@ public class NBAPlayerDAO
 			throw new RuntimeException("error inserting new Player", e);
 		}
 	}
+
+	public Collection<GameLog> getNBAGames(NBATeam against, NBAPlayer player)
+	{
+		try {
+			Collection<GameLog> log = new ArrayList<GameLog>();
+			String qry = "select e.NbaGameLogID "
+					+ "from GAMELOG e "
+					+ "where e.NbaPlayer = ? "
+					+ "AND e.NbaGameLogID in"
+					+ " 	(select NbaGameID "
+					+ "		from NBAGAME "
+					+ "		where (NbaGameHomeTeam = ? OR nbaGameAwayTeam = ?)"
+					+ "		AND (NbaGameHomeTeam =? OR nbaGameAwayTeam =?))";
+			PreparedStatement pstmt = conn.prepareStatement(qry);
+			pstmt.setInt(1, player.getID());
+		    pstmt.setInt(2, player.getTeamID().getNbaTeamID());
+			pstmt.setInt(3, player.getTeamID().getNbaTeamID());
+			pstmt.setInt(4, against.getNbaTeamID());
+			pstmt.setInt(5, against.getNbaTeamID());
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				int id = rs.getInt("NbaGameLogID");
+				System.out.println(id);
+				log.add(dbm.findGame(id));
+			}
+			rs.close();
+			
+			//System.out.println("Team 1:" +player.getTeamID().getNbaTeamID());
+			//System.out.println("Team 2:" +  against.getNbaTeamID());
+			
+			return log;
+		}
+		catch(SQLException e) {
+			dbm.cleanup();
+			throw new RuntimeException("error getting Team Players", e);
+		}
+	}
+
 	
 	public NBAPlayer findbyID(int id)
 	{

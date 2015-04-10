@@ -63,7 +63,7 @@ public class NBATeam
 	{
 		return "Team:" + nbaTeamName + ",Coach:" + teamCoach + ",Season:" + nbaSeason; 
 	}
-	
+
 	public Collection<NBAPlayer> getPlayers()
 	{
 		if (players == null) players = dao.getNBAPlayers(nbaTeamID);
